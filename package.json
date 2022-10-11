@@ -28,6 +28,7 @@
     "node": "16"
   },
   "devDependencies": {
+    "@types/jest": "^29.1.2",
     "cypress": "10.6.0",
     "cypress-multi-reporters": "1.6.1",
     "eslint-config-trybe-fundamentals": "1.1.1",
