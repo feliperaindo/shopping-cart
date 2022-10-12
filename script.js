@@ -72,4 +72,8 @@ const createCartItemElement = ({ id, title, price }) => {
   return li;
 };
 
-window.onload = () => { };
+// function test() {
+  
+// }
+
+window.onload = () => {};
