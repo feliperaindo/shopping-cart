@@ -11,4 +11,11 @@ describe('1 - Teste a função fetchProducts', () => {
     await fetchProducts('computador');
     expect(fetch).toBeCalledWith(url);
   });
+  test('Verifica se o retorno da função é igual ao conteúdo de `computadorSearch`', async () => {
+    expect(fetchProducts('computador')).resolves.toEqual(computadorSearch);
+  });
+  test('Verifica o retorno do erro esperando em caso da chamada da função sem parâmetro', async () => {
+    const testError = await fetchProducts();
+    expect(testError).rejects.toEqual('You must provide an url');
+  });
 });

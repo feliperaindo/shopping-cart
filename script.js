@@ -72,8 +72,4 @@
 // //   return li;
 // };
 
-// // function test() {
-  
-// // }
-
 // window.onload = () => {};
