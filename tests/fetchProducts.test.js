@@ -15,7 +15,6 @@ describe('1 - Teste a função fetchProducts', () => {
     expect(fetchProducts('computador')).resolves.toEqual(computadorSearch);
   });
   test('Verifica o retorno do erro esperando em caso da chamada da função sem parâmetro', async () => {
-    const testError = await fetchProducts();
-    expect(testError).rejects.toEqual('You must provide an url');
+    expect(fetchProducts()).resolves.toThrow('You must provide an url');
   });
 });
