@@ -55,6 +55,11 @@ const createProductItemElement = ({ id, title, thumbnail }) => {
  */
 const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
 
+function cartItemClickListener(element) {
+  const clickedElement = element.target;
+  console.log(clickedElement);
+}
+
 /**
  * Função responsável por criar e retornar um item do carrinho.
  * @param {Object} product - Objeto do produto.
