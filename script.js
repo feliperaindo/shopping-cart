@@ -10,10 +10,11 @@
  * @param {string} innerText - Texto do elemento.
  * @returns {Element} Elemento criado.
  */
-const createCustomElement = (element, className, innerText) => {
+const createCustomElement = (element, className, innerText, index = 0) => {
   const e = document.createElement(element);
   e.className = className;
   e.innerText = innerText;
+  e.setAttribute('id', `${element}-${className}-${index}`);
   return e;
 };
 
@@ -22,11 +23,17 @@ const createCustomElement = (element, className, innerText) => {
  * @param {string} imageSource - URL da imagem.
  * @returns {Element} Elemento de imagem do produto.
  */
-const createProductImageElement = (imageSource) => {
-  const img = createCustomElement('img', 'item__image', '');
+const createProductImageElement = (imageSource, index) => {
+  const img = createCustomElement('img', 'item__image', '', index);
   img.src = imageSource;
   return img;
 };
+
+function cartItemClickListener(element) {
+  const clickedElement = element.target.id;
+  const newElement = clickedElement.match(/(\d+)/)[0];
+  console.log(newElement);
+}
 
 /**
  * Função responsável por criar e retornar o elemento do produto.
@@ -36,14 +43,18 @@ const createProductImageElement = (imageSource) => {
  * @param {string} product.thumbnail - URL da imagem do produto.
  * @returns {Element} Elemento de produto.
  */
-const createProductItemElement = ({ id, title, thumbnail }) => {
-  const section = document.createElement('section');
-  section.className = 'item';
+const createProductItemElement = ({ id, title, thumbnail }, index) => {
+  const section = createCustomElement('section', 'item', '', index);
 
-  section.appendChild(createCustomElement('span', 'item_id', id));
-  section.appendChild(createCustomElement('span', 'item__title', title));
-  section.appendChild(createProductImageElement(thumbnail));
-  section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
+  section.appendChild(createCustomElement('span', 'item_id', id, index));
+  section.appendChild(createCustomElement('span', 'item__title', title, index));
+  section.appendChild(createProductImageElement(thumbnail, index));
+
+  const text = 'Adicionar ao carrinho!';
+  const listeningButton = createCustomElement('button', 'item__add', text, index);
+  listeningButton.addEventListener('click', cartItemClickListener);
+
+  section.appendChild(listeningButton);
 
   return section;
 };
@@ -54,11 +65,6 @@ const createProductItemElement = ({ id, title, thumbnail }) => {
  * @returns {string} ID do produto.
  */
 const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
-
-function cartItemClickListener(element) {
-  const clickedElement = element.target;
-  console.log(clickedElement);
-}
 
 /**
  * Função responsável por criar e retornar um item do carrinho.
@@ -82,8 +88,7 @@ const populateWebPage = (population) => {
 
 const getEachItemFromAPI = (objFromAPI) => {
   objFromAPI.forEach((objProduct, index) => {
-    const constructor = createProductItemElement(objProduct);
-    constructor.setAttribute('id', `item-number-${index}`);
+    const constructor = createProductItemElement(objProduct, index);
     populateWebPage(constructor);
   });
 };
