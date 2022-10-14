@@ -4,18 +4,6 @@
 // Fique a vontade para modificar o código já escrito e criar suas próprias funções!
 
 /**
- * Função responsável por criar e retornar o elemento de imagem do produto.
- * @param {string} imageSource - URL da imagem.
- * @returns {Element} Elemento de imagem do produto.
- */
-const createProductImageElement = (imageSource) => {
-  const img = document.createElement('img');
-  img.className = 'item__image';
-  img.src = imageSource;
-  return img;
-};
-
-/**
  * Função responsável por criar e retornar qualquer elemento.
  * @param {string} element - Nome do elemento a ser criado.
  * @param {string} className - Classe do elemento.
@@ -27,6 +15,17 @@ const createCustomElement = (element, className, innerText) => {
   e.className = className;
   e.innerText = innerText;
   return e;
+};
+
+/**
+ * Função responsável por criar e retornar o elemento de imagem do produto.
+ * @param {string} imageSource - URL da imagem.
+ * @returns {Element} Elemento de imagem do produto.
+ */
+const createProductImageElement = (imageSource) => {
+  const img = createCustomElement('img', 'item__image', '');
+  img.src = imageSource;
+  return img;
 };
 
 /**
@@ -65,11 +64,25 @@ const getIdFromProductItem = (product) => product.querySelector('span.id').inner
  * @returns {Element} Elemento de um item do carrinho.
  */
 const createCartItemElement = ({ id, title, price }) => {
-  const li = document.createElement('li');
-  li.className = 'cart__item';
-  li.innerText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
+  const liText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
+  const li = createCustomElement('li', 'cart__item', liText);
   li.addEventListener('click', cartItemClickListener);
   return li;
 };
 
-window.onload = () => {};
+const populateWebPage = (population) => {
+  const getList = document.querySelector('#items-container');
+  getList.appendChild(population);
+};
+
+const getEachItemFromAPI = (objFromAPI) => {
+  objFromAPI.forEach((objProduct) => {
+    const constructor = createProductItemElement(objProduct);
+    populateWebPage(constructor);
+  });
+};
+
+window.onload = async () => {
+  const requestAPI = await fetchProducts('computador');
+  getEachItemFromAPI(requestAPI.results);
+};
