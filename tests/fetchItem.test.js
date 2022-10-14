@@ -6,9 +6,6 @@ describe('2 - Teste a função fetchItem', () => {
   test('Verifica se `fetchItem` é uma função', () => {
     expect(typeof fetchItem).toBe('function')
   });
-  test('Verifica se `fetch` foi chamado ao chamar a função `fetchItem`', async ()=> {
-    expect(await fetchItem('MLB1615760527')).toBeCalled(fetch);
-  });
   test('Verifica se a função `fetchItem` utiliza o endpoint quando aplicado o parâmetro `MLB1615760527`', async () => {
     const url = "https://api.mercadolibre.com/items/MLB1615760527";
     await fetchItem('MLB1615760527')

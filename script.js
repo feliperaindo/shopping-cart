@@ -81,8 +81,9 @@ const populateWebPage = (population) => {
 };
 
 const getEachItemFromAPI = (objFromAPI) => {
-  objFromAPI.forEach((objProduct) => {
+  objFromAPI.forEach((objProduct, index) => {
     const constructor = createProductItemElement(objProduct);
+    constructor.setAttribute('id', `item-number-${index}`);
     populateWebPage(constructor);
   });
 };
