@@ -1,9 +1,13 @@
-const getBuyList = document.querySelector('#cart__items');
+/** Variáveis globais.
+ * @param {HTML} GET_BUY_LIST - Lista onde serão armazenados os itens adcionados ao carrinho de compras.
+ */
+const GET_BUY_LIST = document.querySelector('#cart__items');
 
 /** Função responsável por criar e retornar qualquer elemento.
  * @param {string} element - Nome do elemento a ser criado.
  * @param {string} className - Classe do elemento.
  * @param {string} innerText - Texto do elemento.
+ * @param {number} index - Número do elemento, necessário para composição única do ID do elemento
  * @returns {Element} Elemento criado.
  */
 const createCustomElement = (element, className, innerText, index = 0) => {
@@ -24,7 +28,11 @@ const createProductImageElement = (imageSource, index) => {
   return img;
 };
 
-const removerListener = (productClicked) => getBuyList.removeChild(productClicked.target);
+/** Função responsável por remover elemento do carrinho de compras.
+ * @param {string} productClicked - Elemento selecionado para remoção do carrinho.
+ * @param {string} getBuyList - Elemento HTML que armazena lista de compras.
+ */
+const removerListener = (productClicked) => GET_BUY_LIST.removeChild(productClicked.target);
 
 /** Função responsável por criar e retornar um item do carrinho.
  * @param {Object} product - Objeto do produto.
@@ -40,10 +48,22 @@ const createCartItemElement = ({ id, title, price }, number) => {
   return li;
 };
 
-const addItemInCart = (productToBuy) => getBuyList.appendChild(productToBuy);
+/** Função responsável por adicionar elemento ao carrinho de compras.
+ * @param {string} productToBuy - Elemento selecionado para adição ao carrinho.
+ * @param {string} getBuyList - Elemento HTML que armazena lista de compras.
+ */
+const addItemInCart = (productToBuy) => GET_BUY_LIST.appendChild(productToBuy);
 
+/** Função responsável por requisitar dados do produto à API.
+ * @param {string} productClicked - Elemento selecionado pelo usuário através do clique no botão "adicionar ao carrinho".
+ */
 const requireClickedItemInfo = async (productClicked) => fetchItem(productClicked);
 
+/** Função responsável administrar o fluxo de trabalho do código após interação do usuário com o botão "adicionar ao carrinho".
+ * @param {string} itemClicked - Elemento selecionado pelo usuário através do clique no botão "adicionar ao carrinho".
+ * @param {object} infoItem - constante que armazenará o objeto, resultado da requisição à API.
+ * @param {string} itemToAddInBuyList - constante que armazena o resultado, advindo da função construtora do Elemento que será adicionado ao HTML. 
+ */
 async function market(itemClicked, number) {
   const infoItem = await requireClickedItemInfo(itemClicked);
   const itemToAddInBuyList = createCartItemElement(infoItem, number);
@@ -84,11 +104,20 @@ const createProductItemElement = ({ id, title, thumbnail }, index) => {
   return section;
 };
 
+/** Função responsável por adicionar Elemento, vindo da requisição à API, ao HTML.
+ * @param {string} population - Elemento "section".
+ * @param {HTML} getSectionContainer - Constante que armazena elemento HTML.
+ */
 const populateWebPage = (population) => {
-  const getList = document.querySelector('#items-container');
-  getList.appendChild(population);
+  const getSectionContainer = document.querySelector('#items-container');
+  getSectionContainer.appendChild(population);
 };
 
+/** Função responsável gerenciar a adição de cada item advindo da consulta à API.
+ * @param {Object} objFromAPI - Objeto retornado pela API com os dados dos itens que serão adicionado à página HTML. 
+ * @param {Object} objProduct - Cada item, advindo da API, estruturando também como um objeto.
+ * @param {string} constructor - constante que armazena o novo elemento HTML criado pela função chamada.
+ */
 const getEachItemFromAPI = (objFromAPI) => {
   objFromAPI.forEach((objProduct, index) => {
     const constructor = createProductItemElement(objProduct, index);
@@ -96,6 +125,9 @@ const getEachItemFromAPI = (objFromAPI) => {
   });
 };
 
+/** Função responsável iniciar o script, e a consulta à API, assim que a página HTML é carregada.
+ * @param {Object} requestAPI - constante que armazena o todos os dados do objeto retornado pela API.
+ */
 window.onload = async () => {
   const requestAPI = await fetchProducts('computador');
   getEachItemFromAPI(requestAPI.results);
