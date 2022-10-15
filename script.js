@@ -1,3 +1,5 @@
+const getBuyList = document.querySelector('#cart__items');
+
 /** Função responsável por criar e retornar qualquer elemento.
  * @param {string} element - Nome do elemento a ser criado.
  * @param {string} className - Classe do elemento.
@@ -22,9 +24,7 @@ const createProductImageElement = (imageSource, index) => {
   return img;
 };
 
-function cartItemClickListener() {
-  return 0;
-}
+const removerListener = (productClicked) => getBuyList.removeChild(productClicked.target);
 
 /** Função responsável por criar e retornar um item do carrinho.
  * @param {Object} product - Objeto do produto.
@@ -36,14 +36,11 @@ function cartItemClickListener() {
 const createCartItemElement = ({ id, title, price }, number) => {
   const liText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
   const li = createCustomElement('li', 'cart__item', liText, number);
-  li.addEventListener('click', cartItemClickListener);
+  li.addEventListener('click', removerListener);
   return li;
 };
 
-function addItemInCart(productToBuy) {
-  const getBuyList = document.querySelector('#cart__items');
-  getBuyList.appendChild(productToBuy);
-}
+const addItemInCart = (productToBuy) => getBuyList.appendChild(productToBuy);
 
 const requireClickedItemInfo = async (productClicked) => fetchItem(productClicked);
 
