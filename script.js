@@ -1,7 +1,9 @@
 /** Variáveis globais.
  * @param {HTML} GET_BUY_LIST - Lista onde serão armazenados os itens adcionados ao carrinho de compras.
+ * @param {number} counter - contador de itens adcionados ao carrinho.
  */
 const GET_BUY_LIST = document.querySelector('#cart__items');
+let counter = 1;
 
 /** Função responsável atribuir um ID ao elemento HTML.
 * @param {HTML} element - Elemento a ser aplicado o ID.
@@ -41,7 +43,10 @@ const createProductImageElement = (imageSource) => {
 * @param {string} productClicked - Elemento selecionado para remoção do carrinho.
 * @param {string} GET_BUY_LIST - Elemento HTML que armazena lista de compras.
 */
-const removerListener = (productClicked) => GET_BUY_LIST.removeChild(productClicked.target);
+const removerListener = (productClicked) => { 
+  GET_BUY_LIST.removeChild(productClicked.target);
+  (counter -= 1);
+};
 
 /** Função responsável por criar e retornar um item do carrinho.
 * @param {Object} product - Objeto do produto.
@@ -53,6 +58,8 @@ const removerListener = (productClicked) => GET_BUY_LIST.removeChild(productClic
 const createCartItemElement = ({ id, title, price }) => {
   const liText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
   const li = createCustomElement('li', 'cart__item', liText);
+  setIdAtribute(li, 'li', 'cart__item', counter);
+  counter += 1;
   li.addEventListener('click', removerListener);
   return li;
 };
