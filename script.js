@@ -4,15 +4,9 @@
  */
 const GET_BUY_LIST = document.querySelector('#cart__items');
 
-function saveInLocalStorage({ id, title, price }) {
-  const elementToSave = { id, title, price };
+function saveInLocalStorage({ id, title, price }, liElement) {
+  const elementToSave = { id, title, price, HTMLId: liElement.id };
   saveCartItems(elementToSave);
-}
-
-function removeItemFromLocalStorage(product) {
-  const localStorage = getSavedCartItems();
-  const getIdProductClicked = product.innerText.split('|')[0].split('ID:')[1].replace(/\s+/g, '');
-  console.log(getIdProductClicked);
 }
 
 /** Função responsável atribuir um ID ao elemento HTML.
@@ -49,13 +43,21 @@ const createProductImageElement = (imageSource) => {
   return img;
 };
 
+const renameAllIdsFromCart = () => {
+  GET_BUY_LIST.childNodes.forEach((each, index) => setIdAtribute(each, 'li', 'cart__item', index));
+};
+
 /** Função responsável por remover elemento do carrinho de compras.
 * @param {string} productClicked - Elemento selecionado para remoção do carrinho.
 * @param {string} GET_BUY_LIST - Elemento HTML que armazena lista de compras.
 */
 const removerListener = (productClicked) => {
+  const getIdFrom = productClicked.target.id;
+  
+  saveCartItems(getIdFrom, 'remove');
+
   GET_BUY_LIST.removeChild(productClicked.target);
-  removeItemFromLocalStorage(productClicked.target);
+  renameAllIdsFromCart();
 };
 
 /** Função responsável por criar e retornar um item do carrinho.
@@ -69,6 +71,7 @@ const createCartItemElement = ({ id, title, price }) => {
   const liText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
   const li = createCustomElement('li', 'cart__item', liText);
   li.addEventListener('click', removerListener);
+  setIdAtribute(li, 'li', 'cart__item', GET_BUY_LIST.children.length);
   return li;
 };
 
@@ -92,7 +95,7 @@ async function market(itemClicked) {
   const infoItem = await requireClickedItemInfo(itemClicked);
   const itemToAddInBuyList = createCartItemElement(infoItem);
   addItemInCart(itemToAddInBuyList);
-  saveInLocalStorage(infoItem);
+  saveInLocalStorage(infoItem, itemToAddInBuyList);
 }
 
 /** Função que recupera o ID do produto passado como parâmetro.
