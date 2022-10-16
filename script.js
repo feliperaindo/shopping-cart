@@ -4,56 +4,67 @@
  */
 const GET_BUY_LIST = document.querySelector('#cart__items');
 
+/** Função responsável por salvar os elementos contidos no carrinho de compras no local Storage.
+ * @param {string} id - Id do produto retornado pela API.
+ * @param {string} title - Título do produto retornado pela API.
+ * @param {number} price - Preço do produto retornado pela API.
+ * @param {HTML} liElement - Elemento HTML que armazena as informações do produto.
+ */
 function saveInLocalStorage({ id, title, price }, liElement) {
   const elementToSave = { id, title, price, HTMLId: liElement.id };
   saveCartItems(elementToSave);
 }
 
 /** Função responsável atribuir um ID ao elemento HTML.
-* @param {HTML} element - Elemento a ser aplicado o ID.
-* @param {string} elementType - tipo de elemento HTML.
-* @param {string} className - Classe do elemento.
-* @param {number} number - Número do elemento, necessário para composição única do ID do elemento
-*/
+  * @param {HTML} element - Elemento a ser aplicado o ID.
+  * @param {string} elementType - tipo de elemento HTML.
+  * @param {string} className - Classe do elemento.
+  * @param {number} number - Número do elemento, necessário para composição única do ID do elemento
+  */
 const setIdAtribute = (element, elementType, className, number) =>
   element.setAttribute('id', `${elementType}-${className}-${number}`);
 
 /** Função responsável por criar e retornar qualquer elemento.
-* @param {string} element - Nome do elemento a ser criado.
-* @param {string} className - Classe do elemento.
-* @param {string} innerText - Texto do elemento.
-* @param {number} index - Número do elemento, necessário para composição única do ID do elemento
-* @returns {Element} Elemento criado.
-*/
+  * @param {string} element - Nome do elemento a ser criado.
+  * @param {string} className - Classe do elemento.
+  * @param {string} innerText - Texto do elemento.
+  * @param {number} index - Número do elemento, necessário para composição única do ID do elemento
+  * @returns {Element} Elemento criado.
+  */
 const createCustomElement = (element, className, innerText) => {
   const e = document.createElement(element);
   e.className = className;
   e.innerText = innerText;
-  //  e.setAttribute('id', `${element}-${className}-${index}`);
   return e;
 };
 
 /** Função responsável por criar e retornar o elemento de imagem do produto.
-* @param {string} imageSource - URL da imagem.
-* @returns {Element} Elemento de imagem do produto.
-*/
+  * @param {string} imageSource - URL da imagem.
+  * @returns {Element} Elemento de imagem do produto.
+  */
 const createProductImageElement = (imageSource) => {
   const img = createCustomElement('img', 'item__image', '');
   img.src = imageSource;
   return img;
 };
 
+/** Função responsável por renoemar todos os ID's do elementos no carrinho de compras após a remoção de algum item.
+ * @param {HTML} GET_BUY_LIST.childNodes - Array contendo todos os itens adicionados ao carrinho de compras. 
+ */
 const renameAllIdsFromCart = () => {
   GET_BUY_LIST.childNodes.forEach((each, index) => setIdAtribute(each, 'li', 'cart__item', index));
 };
 
 /** Função responsável por remover elemento do carrinho de compras.
-* @param {string} productClicked - Elemento selecionado para remoção do carrinho.
-* @param {string} GET_BUY_LIST - Elemento HTML que armazena lista de compras.
-*/
-const removerListener = (productClicked) => {
+  * @param {string} productClicked - Elemento selecionado para remoção do carrinho.
+  * @param {string} getIdFrom - Constante que armazena o ID do item clicado.
+  * @param {string} GET_BUY_LIST - Elemento HTML que armazena lista de compras.
+  * @param {Function} saveCartItems - Usada para remover o produto de local storage.
+  * @param {Function} renameAllIdsFromCart - Usada para renomear os ID's dos produtos adicionados ao carrinho de compras.
+  */
+const itemRemoverFromCart = (productClicked) => {
   const getIdFrom = productClicked.target.id;
-  
+
   saveCartItems(getIdFrom, 'remove');
 
   GET_BUY_LIST.removeChild(productClicked.target);
@@ -70,7 +81,7 @@ const removerListener = (productClicked) => {
 const createCartItemElement = ({ id, title, price }) => {
   const liText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
   const li = createCustomElement('li', 'cart__item', liText);
-  li.addEventListener('click', removerListener);
+  li.addEventListener('click', itemRemoverFromCart);
   setIdAtribute(li, 'li', 'cart__item', GET_BUY_LIST.children.length);
   return li;
 };
