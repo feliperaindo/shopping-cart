@@ -1,12 +1,11 @@
 const saveCartItems = (itemToSave) => {
-  const dataToLocalStorage = [JSON.stringify(itemToSave)];
-
   if (!localStorage.getItem('cartItem')) {
-    localStorage.setItem('cartItem', dataToLocalStorage);
+    localStorage.setItem('cartItem', JSON.stringify([itemToSave]));
+    return;
   }
-  const getOldLocalStorage = localStorage.getItem('cartItem');
-  const newLocalStorage = [...getOldLocalStorage, dataToLocalStorage];
-  localStorage.setItem('cartItem', newLocalStorage);
+  const getOldLocalStorage = JSON.parse(localStorage.getItem('cartItem'));
+  const newLocalStorage = [...getOldLocalStorage, itemToSave];
+  localStorage.setItem('cartItem', JSON.stringify(newLocalStorage));
 };
 
 if (typeof module !== 'undefined') {

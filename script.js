@@ -3,7 +3,17 @@
  * @param {number} counter - contador de itens adcionados ao carrinho.
  */
 const GET_BUY_LIST = document.querySelector('#cart__items');
-let counter = 1;
+
+function saveInLocalStorage({ id, title, price }) {
+  const elementToSave = { id, title, price };
+  saveCartItems(elementToSave);
+}
+
+function removeItemFromLocalStorage(product) {
+  const localStorage = getSavedCartItems();
+  const getIdProductClicked = product.innerText.split('|')[0].split('ID:')[1].replace(/\s+/g, '');
+  console.log(getIdProductClicked);
+}
 
 /** Função responsável atribuir um ID ao elemento HTML.
 * @param {HTML} element - Elemento a ser aplicado o ID.
@@ -43,9 +53,9 @@ const createProductImageElement = (imageSource) => {
 * @param {string} productClicked - Elemento selecionado para remoção do carrinho.
 * @param {string} GET_BUY_LIST - Elemento HTML que armazena lista de compras.
 */
-const removerListener = (productClicked) => { 
+const removerListener = (productClicked) => {
   GET_BUY_LIST.removeChild(productClicked.target);
-  (counter -= 1);
+  removeItemFromLocalStorage(productClicked.target);
 };
 
 /** Função responsável por criar e retornar um item do carrinho.
@@ -58,8 +68,6 @@ const removerListener = (productClicked) => {
 const createCartItemElement = ({ id, title, price }) => {
   const liText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
   const li = createCustomElement('li', 'cart__item', liText);
-  setIdAtribute(li, 'li', 'cart__item', counter);
-  counter += 1;
   li.addEventListener('click', removerListener);
   return li;
 };
@@ -84,6 +92,7 @@ async function market(itemClicked) {
   const infoItem = await requireClickedItemInfo(itemClicked);
   const itemToAddInBuyList = createCartItemElement(infoItem);
   addItemInCart(itemToAddInBuyList);
+  saveInLocalStorage(infoItem);
 }
 
 /** Função que recupera o ID do produto passado como parâmetro.
@@ -158,10 +167,17 @@ const getEachItemFromAPI = (ArrayDeObjFromAPI) => {
   });
 };
 
+// function localStorageManager () {
+//   if (!getSavedCartItems()) {
+//     saveCartItems();
+//   }
+// }
+
 /** Função responsável iniciar o script, e a consulta à API, assim que a página HTML é carregada.
 * @param {Object} requestAPI - constante que armazena o todos os dados do objeto retornado pela API.
 */
 window.onload = async () => {
   const requestAPI = await fetchProducts('computador');
   getEachItemFromAPI(requestAPI.results);
+  // localStorageManager();
 };
