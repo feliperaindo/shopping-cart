@@ -1,5 +1,5 @@
-const removeCartItemFromLocalStorage = (itemToRemove) => {
-  const data = JSON.parse(localStorage.getItem('cartItem'));
+const removeCartItemFromLocalStorage = (key, itemToRemove) => {
+  const data = JSON.parse(localStorage.getItem(key));
 
   const findItemToRemoved = data.filter((removeItem) => removeItem.HTMLId !== itemToRemove);
   const renameAllData = findItemToRemoved.map(({ id, title, price, HTMLId }, index) => {
@@ -8,21 +8,21 @@ const removeCartItemFromLocalStorage = (itemToRemove) => {
     return newObj;
   });
   
-  localStorage.setItem('cartItem', JSON.stringify(renameAllData));
+  localStorage.setItem(key, JSON.stringify(renameAllData));
 };
 
-const saveCartItems = (item, actOf = undefined) => {
-  if (!localStorage.getItem('cartItem')) {
-    localStorage.setItem('cartItem', JSON.stringify([item]));
+const saveCartItems = (key, item, actOf = undefined) => {
+  if (!localStorage.getItem(key)) {
+    localStorage.setItem(key, JSON.stringify([item]));
     return;
   }
   if (actOf === 'remove') {
-    removeCartItemFromLocalStorage(item);
+    removeCartItemFromLocalStorage(key, item);
     return;
   }
-  const getOldLocalStorage = JSON.parse(localStorage.getItem('cartItem'));
+  const getOldLocalStorage = JSON.parse(localStorage.getItem(key));
   const newLocalStorage = [...getOldLocalStorage, item];
-  localStorage.setItem('cartItem', JSON.stringify(newLocalStorage));
+  localStorage.setItem(key, JSON.stringify(newLocalStorage));
 };
 
 if (typeof module !== 'undefined') {

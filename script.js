@@ -12,7 +12,7 @@ const GET_BUY_LIST = document.querySelector('#cart__items');
  */
 function saveInLocalStorage({ id, title, price }, liElement) {
   const elementToSave = { id, title, price, HTMLId: liElement.id };
-  saveCartItems(elementToSave);
+  saveCartItems('cartItem', elementToSave);
 }
 
 /** Função responsável atribuir um ID ao elemento HTML.
@@ -44,6 +44,7 @@ const createCustomElement = (element, className, innerText) => {
   */
 const createProductImageElement = (imageSource) => {
   const img = createCustomElement('img', 'item__image', '');
+  img.setAttribute('alt', 'product image');
   img.src = imageSource;
   return img;
 };
@@ -65,7 +66,7 @@ const renameAllIdsFromCart = () => {
 const itemRemoverFromCart = (productClicked) => {
   const getIdFrom = productClicked.target.id;
 
-  saveCartItems(getIdFrom, 'remove');
+  saveCartItems('cartItem', getIdFrom, 'remove');
 
   GET_BUY_LIST.removeChild(productClicked.target);
   renameAllIdsFromCart();
