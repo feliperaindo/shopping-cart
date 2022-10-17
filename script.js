@@ -1,68 +1,85 @@
-/** Variáveis globais.
- * @param {HTML} GET_BUY_LIST - Lista onde serão armazenados os itens adcionados ao carrinho de compras.
- * @param {number} counter - contador de itens adcionados ao carrinho.
- */
+// Varíaveis Globais.
 const GET_BUY_LIST = document.querySelector('#cart__items');
 
-/** Função responsável por requisitar dados do produto à API.
-  * @param {string} productClicked - Elemento selecionado pelo usuário através do clique no botão "adicionar ao carrinho".
-  */
- const requireClickedItemInfo = async (productClicked) => fetchItem(productClicked);
+// Função de consulta à API
+const requireClickedItemInfo = async (productClicked) => fetchItem(productClicked);
 
-/** Função responsável por salvar os elementos contidos no carrinho de compras no local Storage.
- * @param {string} id - Id do produto retornado pela API.
- * @param {HTML} liElement - Elemento HTML que armazena as informações do produto.
- */
-function saveInLocalStorage({ id }, liElement) {
-  const elementToSave = { id, HTMLId: liElement.id };
-  saveCartItems('cartItem', elementToSave);
-}
-
-/** Função responsável atribuir um ID ao elemento HTML.
-  * @param {HTML} element - Elemento a ser aplicado o ID.
-  * @param {string} elementType - tipo de elemento HTML.
-  * @param {string} className - Classe do elemento.
-  * @param {number} number - Número do elemento, necessário para composição única do ID do elemento
-  */
+// Funçẽos de construção da página
 const setIdAtribute = (element, elementType, className, number) =>
   element.setAttribute('id', `${elementType}-${className}-${number}`);
-
-/** Função responsável por criar e retornar qualquer elemento.
-  * @param {string} element - Nome do elemento a ser criado.
-  * @param {string} className - Classe do elemento.
-  * @param {string} innerText - Texto do elemento.
-  * @param {number} index - Número do elemento, necessário para composição única do ID do elemento
-  * @returns {Element} Elemento criado.
-  */
 const createCustomElement = (element, className, innerText) => {
   const e = document.createElement(element);
   e.className = className;
   e.innerText = innerText;
   return e;
 };
-
-/** Função responsável por criar e retornar o elemento de imagem do produto.
-  * @param {string} imageSource - URL da imagem.
-  * @returns {Element} Elemento de imagem do produto.
-  */
 const createProductImageElement = (imageSource) => {
   const img = createCustomElement('img', 'item__image', '');
   img.setAttribute('alt', 'product image');
   img.src = imageSource;
   return img;
 };
+const createProductItemElement = ({ id, title, thumbnail }, number) => {
+  const text = 'Adicionar ao carrinho!';
 
+  const section = createCustomElement('section', 'item', '');
+  const spanId = createCustomElement('span', 'item_id', id);
+  const spanTitle = createCustomElement('span', 'item__title', title);
+  const img = createProductImageElement(thumbnail);
+  const listeningButton = createCustomElement('button', 'item__add', text);
+
+  setIdAtribute(section, 'section', 'item', number);
+  setIdAtribute(spanId, 'span', 'item_id', number);
+  setIdAtribute(spanTitle, 'span', 'item__title', number);
+  setIdAtribute(listeningButton, 'button', 'item__add', number);
+
+  section.appendChild(spanId);
+  section.appendChild(spanTitle);
+  section.appendChild(img);
+  section.appendChild(listeningButton);
+
+  return section;
+};
+const populateWebPage = (population) => {
+  const getSectionContainer = document.querySelector('#items-container');
+  getSectionContainer.appendChild(population);
+};
+const getEachItemFromAPI = (ArrayDeObjFromAPI) => {
+  ArrayDeObjFromAPI.forEach((objProduct, index) => {
+    const constructor = createProductItemElement(objProduct, index);
+    populateWebPage(constructor);
+  });
+};
+
+// Funções de Local Storage
+const removeCartItemFromLocalStorage = (itemToRemove) => {
+  const data = getSavedCartItems('cartItems');
+  const findItemToRemoved = data.filter((removeItem) => removeItem.HTMLId !== itemToRemove);
+  const renameAllData = findItemToRemoved.map(({ id, title, price, HTMLId }, index) => {
+    const newId = HTMLId.replace(/\d+/g, index);
+    const newObj = { id: [id], title: [title], price: [price], HTMLId: newId };
+    return newObj;
+  });
+  saveCartItems('cartItems', renameAllData);
+};
+function saveInLocalStorage({ id, title, price }, liElement) {
+  const localStorage = getSavedCartItems('cartItems');
+  console.log(localStorage);
+  // const elementToSave = { id, title, price, HTMLId: liElement.id };
+  // localStorage.push(elementToSave);
+  // saveCartItems('cartItem', localStorage);
+}
+
+// Funções relacionadas ao carrinho de compras
 function updateWindowPrice(priceUpdate = 0) {
   const getHTMLElement = document.querySelector('#span-price');
   getHTMLElement.innerText = `Total: $ ${priceUpdate}`;
 }
-
 const getPrice = async (productInCart) => {
   const getId = productInCart.innerText.split('|')[0].replace(/\s+/g, '').split('ID:')[1];
   const InfoOfProduct = await requireClickedItemInfo(getId);
   return Math.round(InfoOfProduct.price);
 };
-
 const totalPriceCalculator = async () => {
   let totalPrice = 0;
   if (!GET_BUY_LIST.childNodes.length) {
@@ -75,39 +92,20 @@ const totalPriceCalculator = async () => {
     });
   }
 };
-
-/** Função responsável por renoemar todos os ID's do elementos no carrinho de compras após a remoção de algum item.
-   * @param {HTML} GET_BUY_LIST.childNodes - Array contendo todos os itens adicionados ao carrinho de compras. 
-   */
 const renameAllIdsFromCart = () => {
   GET_BUY_LIST.childNodes.forEach((each, index) => setIdAtribute(each, 'li', 'cart__item', index));
 };
-
-/** Função responsável por remover elemento do carrinho de compras.
-  * @param {string} productClicked - Elemento selecionado para remoção do carrinho.
-  * @param {string} getIdFrom - Constante que armazena o ID do item clicado.
-  * @param {string} GET_BUY_LIST - Elemento HTML que armazena lista de compras.
-  * @param {Function} saveCartItems - Usada para remover o produto de local storage.
-  * @param {Function} renameAllIdsFromCart - Usada para renomear os ID's dos produtos adicionados ao carrinho de compras.
-  */
+const addItemInCart = (productToBuy) => GET_BUY_LIST.appendChild(productToBuy);
 const itemRemoverFromCart = async (productClicked) => {
   const getIdFrom = productClicked.target.id;
 
-  saveCartItems('cartItem', getIdFrom, 'remove');
+  removeCartItemFromLocalStorage(getIdFrom);
 
   GET_BUY_LIST.removeChild(productClicked.target);
   renameAllIdsFromCart();
 
   await totalPriceCalculator();
 };
-
-/** Função responsável por criar e retornar um item do carrinho.
-  * @param {Object} product - Objeto do produto.
-  * @param {string} product.id - ID do produto.
-  * @param {string} product.title - Título do produto.
-  * @param {string} product.price - Preço do produto.
-  * @returns {Element} Elemento de um item do carrinho.
-  */
 const createCartItemElement = ({ id, title, price }) => {
   const liText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
   const li = createCustomElement('li', 'cart__item', liText);
@@ -116,17 +114,7 @@ const createCartItemElement = ({ id, title, price }) => {
   return li;
 };
 
-/** Função responsável por adicionar elemento ao carrinho de compras.
-  * @param {string} productToBuy - Elemento selecionado para adição ao carrinho.
-  * @param {string} GET_BUY_LIST - Elemento HTML que armazena lista de compras.
-  */
-const addItemInCart = (productToBuy) => GET_BUY_LIST.appendChild(productToBuy);
-
-/** Função responsável administrar o fluxo de trabalho do código após interação do usuário com o botão "adicionar ao carrinho".
-  * @param {string} itemClicked - Elemento selecionado pelo usuário através do clique no botão "adicionar ao carrinho".
-  * @param {object} infoItem - constante que armazenará o objeto, resultado da requisição à API.
-  * @param {string} itemToAddInBuyList - constante que armazena o resultado, advindo da função construtora do Elemento que será adicionado ao HTML. 
-  */
+// Funções de admistração do fluxo
 async function market(itemClicked) {
   const infoItem = await requireClickedItemInfo(itemClicked);
   const itemToAddInBuyList = createCartItemElement(infoItem);
@@ -136,102 +124,34 @@ async function market(itemClicked) {
 
   saveInLocalStorage(infoItem, itemToAddInBuyList);
 }
-
-/** Função que recupera o ID do produto passado como parâmetro.
-  * @param {element} element - Elemento clicado pelo usuário na página web.
-  * @param {string} clickedElement - constante que armazena o ID do botão clicado.
-  * @param {number} getElementNumber - constante que armazena o número do ID do botão clicado.
-  * @param {HTML} elementToSearch - captura o elemento HTML vinculado àquele botão que foi clicado.
-  */
 function getIdFromProductItem(element) {
   const clickedElement = element.target.id;
   const getElementNumber = clickedElement.match(/(\d+)/)[0];
   const elementToSearch = document.querySelector(`#span-item_id-${getElementNumber}`);
   market(elementToSearch.innerText);
 }
-
-/** Função responsável por criar e retornar o elemento do produto.
-  * @param {Object} product - Objeto do produto. 
-  * @param {string} product.id - ID do produto.
-  * @param {string} product.title - Título do produto.
-  * @param {string} product.thumbnail - URL da imagem do produto.
-  * @param {number} number - número identificador do elemento que será criado.
-  * @param {HTML} section - elemento HTML que armazenará os demais elementos.
-  * @param {HTML} spanId - elemento HTML que receberá o ID do produto.
-  * @param {HTML} spanTitle - elemento HTML que receberá a descrição do produto.
-  * @param {HTML} img - elemento HTML que receberá a imagem do produto.
-  * @param {HTML} listeningButton - elemento HTML que terá a função de compra do produto.
-  * @returns {Element} Elemento de produto.
-  */
-const createProductItemElement = ({ id, title, thumbnail }, number) => {
-  const section = createCustomElement('section', 'item', '');
-  const spanId = createCustomElement('span', 'item_id', id);
-  const spanTitle = createCustomElement('span', 'item__title', title);
-  const img = createProductImageElement(thumbnail);
-
-  setIdAtribute(section, 'section', 'item', number);
-  setIdAtribute(spanId, 'span', 'item_id', number);
-  setIdAtribute(spanTitle, 'span', 'item__title', number);
-
-  section.appendChild(spanId);
-  section.appendChild(spanTitle);
-  section.appendChild(img);
-
-  const text = 'Adicionar ao carrinho!';
-  const listeningButton = createCustomElement('button', 'item__add', text);
-  listeningButton.addEventListener('click', getIdFromProductItem);
-
-  setIdAtribute(listeningButton, 'button', 'item__add', number);
-  section.appendChild(listeningButton);
-
-  return section;
-};
-
-/** Função responsável por adicionar Elemento, vindo da requisição à API, ao HTML.
-  * @param {string} population - Elemento "section".
-  * @param {HTML} getSectionContainer - Constante que armazena elemento HTML.
-  */
-const populateWebPage = (population) => {
-  const getSectionContainer = document.querySelector('#items-container');
-  getSectionContainer.appendChild(population);
-};
-
-/** Função responsável gerenciar a adição de cada item advindo da consulta à API.
-  * @param {Array} ArrayDeObjFromAPI - Arrya de objetos retornado pela API, com os dados dos itens que serão adicionado à página HTML. 
-  * @param {Object} objProduct - Cada item, advindo da API, estruturando como um objeto.
-  * @param {string} constructor - constante que armazena o novo elemento HTML criado pela função chamada.
-  * @param {number} index - número identificador de cada objeto dentro do array.
-  */
-const getEachItemFromAPI = (ArrayDeObjFromAPI) => {
-  ArrayDeObjFromAPI.forEach((objProduct, index) => {
-    const constructor = createProductItemElement(objProduct, index);
-    populateWebPage(constructor);
-  });
-};
-
-/** Função responsável por recuperar informações armazenadas no local storage e aplicar na página HTML assim que for carregada.
-  * @param {Array} recoveryLocalStorageData - constante que armazena o os dados do objeto retornado pela consulta ao local storage.
-  * @param {Object} itemSaved - Objeto que contém informações do elemento salvo no local storage.
-  * @param {HTML} liElement - Elemento 'lista' HTML que contém as informações do elemento salvo no local storage.
-  */
 async function localStorageManager() {
   const recoveryLocalStorageData = getSavedCartItems('cartItem');
-  if (recoveryLocalStorageData) {
-    recoveryLocalStorageData.forEach(async (itemSaved) => {
-      const infoItem = await requireClickedItemInfo(itemSaved.id);
-      const liElement = createCartItemElement(infoItem);
-      addItemInCart(liElement);
-      await totalPriceCalculator();
-    });
+  if (!recoveryLocalStorageData) {
+    saveCartItems('cartItem', []);
+    return;
   }
+  recoveryLocalStorageData.forEach(async (itemSaved) => {
+    const liElement = createCartItemElement(itemSaved);
+    addItemInCart(liElement);
+    await totalPriceCalculator();
+  });
 }
-
-/** Função responsável iniciar o script, e a consulta à API, assim que a página HTML é carregada.
-  * @param {Object} requestAPI - constante que armazena o todos os dados do objeto retornado pela API.
-  */  
+function makeButtonsDinamics() {
+  const GET_BUTTONS = document.querySelectorAll('.item__add');
+  GET_BUTTONS.forEach((listeningButton) => {
+    listeningButton.addEventListener('click', getIdFromProductItem);
+  });
+}
 window.onload = async () => {
   const requestAPI = await fetchProducts('computador');
   getEachItemFromAPI(requestAPI.results);
+  makeButtonsDinamics();
   updateWindowPrice();
   await localStorageManager();
 };

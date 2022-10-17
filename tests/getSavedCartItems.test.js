@@ -11,7 +11,7 @@ describe('4 - Teste a função getSavedCartItems', () => {
     getSavedCartItems('cartItem')
     expect(localStorage.getItem).toBeCalled();
   });
-  test('Verifica se após chamar a função `saveCartItems` localStorage contem chave de nome `cartItem` e valor respectivo, conforme passado por parâmetro', () => {
+  test('Verifica se após chamar a função `getSavedCartItems` localStorage retorna elemento armazenado com chave de nome `cartItem`', () => {
     getSavedCartItems('cartItem');
     expect(localStorage.getItem).toBeCalledWith('cartItem');
   });
