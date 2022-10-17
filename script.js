@@ -49,6 +49,20 @@ const createProductImageElement = (imageSource) => {
   return img;
 };
 
+function updateWindowPrice(priceUpdate) {
+  const getHTMLElement = document.querySelector('#span-price');
+  getHTMLElement.innerText = `Total: ${priceUpdate}`;
+}
+
+const totalPriceCalculator = () => {
+  let totalPrice = 0;
+  GET_BUY_LIST.childNodes.forEach((productInCart) => {
+    const getPrice = Number(productInCart.innerText.replace(/\s+/g, '').split('PRICE:$')[1]);
+    totalPrice += getPrice;
+  });
+  return Math.round(totalPrice);
+};
+
 /** Função responsável por renoemar todos os ID's do elementos no carrinho de compras após a remoção de algum item.
    * @param {HTML} GET_BUY_LIST.childNodes - Array contendo todos os itens adicionados ao carrinho de compras. 
    */
@@ -70,6 +84,9 @@ const itemRemoverFromCart = (productClicked) => {
 
   GET_BUY_LIST.removeChild(productClicked.target);
   renameAllIdsFromCart();
+
+  const updatePrice = totalPriceCalculator();
+  updateWindowPrice(updatePrice);
 };
 
 /** Função responsável por criar e retornar um item do carrinho.
@@ -107,6 +124,10 @@ async function market(itemClicked) {
   const infoItem = await requireClickedItemInfo(itemClicked);
   const itemToAddInBuyList = createCartItemElement(infoItem);
   addItemInCart(itemToAddInBuyList);
+
+  const updatePrice = totalPriceCalculator();
+  updateWindowPrice(updatePrice);
+
   saveInLocalStorage(infoItem, itemToAddInBuyList);
 }
 
@@ -195,6 +216,8 @@ function localStorageManager() {
       addItemInCart(liElement);
     });
   }
+  const updatePrice = totalPriceCalculator();
+  updateWindowPrice(updatePrice);
 }
 
 /** Função responsável iniciar o script, e a consulta à API, assim que a página HTML é carregada.
