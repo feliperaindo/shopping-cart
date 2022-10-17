@@ -53,17 +53,17 @@ const getEachItemFromAPI = (ArrayDeObjFromAPI) => {
 
 // Funções de Local Storage
 const removeCartItemFromLocalStorage = (itemToRemove) => {
-  const data = getSavedCartItems('cartItems');
-  const findItemToRemoved = data.filter((removeItem) => removeItem.HTMLId !== itemToRemove);
+  const localStorage = JSON.parse(getSavedCartItems('cartItem'));
+  const findItemToRemoved = localStorage.filter((removeItem) => removeItem.HTMLId !== itemToRemove);
   const renameAllData = findItemToRemoved.map(({ id, title, price, HTMLId }, index) => {
     const newId = HTMLId.replace(/\d+/g, index);
     const newObj = { id: [id], title: [title], price: [price], HTMLId: newId };
     return newObj;
   });
-  saveCartItems('cartItems', renameAllData);
+  saveCartItems('cartItem', renameAllData);
 };
 function saveInLocalStorage({ id, title, price }, liElement) {
-  const localStorage = getSavedCartItems('cartItem');
+  const localStorage = JSON.parse(getSavedCartItems('cartItem'));
   const elementToSave = { id, title, price, HTMLId: liElement.id };
   localStorage.push(elementToSave);
   saveCartItems('cartItem', localStorage);
