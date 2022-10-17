@@ -232,5 +232,6 @@ async function localStorageManager() {
 window.onload = async () => {
   const requestAPI = await fetchProducts('computador');
   getEachItemFromAPI(requestAPI.results);
+  updateWindowPrice();
   await localStorageManager();
 };
