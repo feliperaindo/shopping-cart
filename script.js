@@ -54,13 +54,13 @@ const createProductImageElement = (imageSource) => {
 
 function updateWindowPrice(priceUpdate = 0) {
   const getHTMLElement = document.querySelector('#span-price');
-  getHTMLElement.innerText = `Total: $ ${priceUpdate},00`;
+  getHTMLElement.innerText = `Total: $ ${priceUpdate}`;
 }
 
 const getPrice = async (productInCart) => {
   const getId = productInCart.innerText.split('|')[0].replace(/\s+/g, '').split('ID:')[1];
   const InfoOfProduct = await requireClickedItemInfo(getId);
-  return InfoOfProduct.price;
+  return Math.round(InfoOfProduct.price);
 };
 
 const totalPriceCalculator = async () => {
@@ -71,7 +71,7 @@ const totalPriceCalculator = async () => {
     GET_BUY_LIST.childNodes.forEach(async (productInCart) => {
       const price = await getPrice(productInCart);
       totalPrice += price;
-      updateWindowPrice(Math.round(totalPrice));
+      updateWindowPrice(totalPrice);
     });
   }
 };
