@@ -26,5 +26,5 @@ const saveCartItems = (key, item, actOf = undefined) => {
 };
 
 if (typeof module !== 'undefined') {
-  module.exports = saveCartItems;
+  module.exports = { saveCartItems, removeCartItemFromLocalStorage };
 }

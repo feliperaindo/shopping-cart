@@ -188,7 +188,7 @@ const getEachItemFromAPI = (ArrayDeObjFromAPI) => {
   * @param {HTML} liElement - Elemento 'lista' HTML que contém as informações do elemento salvo no local storage.
   */
 function localStorageManager() {
-  const recoveryLocalStorageData = getSavedCartItems();
+  const recoveryLocalStorageData = getSavedCartItems('cartItem');
   if (recoveryLocalStorageData) {
     recoveryLocalStorageData.forEach((itemSaved) => {
       const liElement = createCartItemElement(itemSaved);

@@ -1,8 +1,8 @@
-const getSavedCartItems = () => {
-  if (!localStorage.getItem('cartItem')) {
+const getSavedCartItems = (key) => {
+  if (!localStorage.getItem(key)) {
     return null;
   }
-  return JSON.parse(localStorage.getItem('cartItem'));
+  return JSON.parse(localStorage.getItem(key));
 };
 
 if (typeof module !== 'undefined') {
