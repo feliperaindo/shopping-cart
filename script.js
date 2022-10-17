@@ -4,14 +4,17 @@
  */
 const GET_BUY_LIST = document.querySelector('#cart__items');
 
+/** Função responsável por requisitar dados do produto à API.
+  * @param {string} productClicked - Elemento selecionado pelo usuário através do clique no botão "adicionar ao carrinho".
+  */
+ const requireClickedItemInfo = async (productClicked) => fetchItem(productClicked);
+
 /** Função responsável por salvar os elementos contidos no carrinho de compras no local Storage.
  * @param {string} id - Id do produto retornado pela API.
- * @param {string} title - Título do produto retornado pela API.
- * @param {number} price - Preço do produto retornado pela API.
  * @param {HTML} liElement - Elemento HTML que armazena as informações do produto.
  */
-function saveInLocalStorage({ id, title, price }, liElement) {
-  const elementToSave = { id, title, price, HTMLId: liElement.id };
+function saveInLocalStorage({ id }, liElement) {
+  const elementToSave = { id, HTMLId: liElement.id };
   saveCartItems('cartItem', elementToSave);
 }
 
@@ -49,18 +52,28 @@ const createProductImageElement = (imageSource) => {
   return img;
 };
 
-function updateWindowPrice(priceUpdate) {
+function updateWindowPrice(priceUpdate = 0) {
   const getHTMLElement = document.querySelector('#span-price');
-  getHTMLElement.innerText = `Total: ${priceUpdate}`;
+  getHTMLElement.innerText = `Total: $ ${priceUpdate},00`;
 }
 
-const totalPriceCalculator = () => {
+const getPrice = async (productInCart) => {
+  const getId = productInCart.innerText.split('|')[0].replace(/\s+/g, '').split('ID:')[1];
+  const InfoOfProduct = await requireClickedItemInfo(getId);
+  return InfoOfProduct.price;
+};
+
+const totalPriceCalculator = async () => {
   let totalPrice = 0;
-  GET_BUY_LIST.childNodes.forEach((productInCart) => {
-    const getPrice = Number(productInCart.innerText.replace(/\s+/g, '').split('PRICE:$')[1]);
-    totalPrice += getPrice;
-  });
-  return Math.round(totalPrice);
+  if (!GET_BUY_LIST.childNodes.length) {
+    updateWindowPrice();
+  } else {
+    GET_BUY_LIST.childNodes.forEach(async (productInCart) => {
+      const price = await getPrice(productInCart);
+      totalPrice += price;
+      updateWindowPrice(Math.round(totalPrice));
+    });
+  }
 };
 
 /** Função responsável por renoemar todos os ID's do elementos no carrinho de compras após a remoção de algum item.
@@ -77,7 +90,7 @@ const renameAllIdsFromCart = () => {
   * @param {Function} saveCartItems - Usada para remover o produto de local storage.
   * @param {Function} renameAllIdsFromCart - Usada para renomear os ID's dos produtos adicionados ao carrinho de compras.
   */
-const itemRemoverFromCart = (productClicked) => {
+const itemRemoverFromCart = async (productClicked) => {
   const getIdFrom = productClicked.target.id;
 
   saveCartItems('cartItem', getIdFrom, 'remove');
@@ -85,8 +98,7 @@ const itemRemoverFromCart = (productClicked) => {
   GET_BUY_LIST.removeChild(productClicked.target);
   renameAllIdsFromCart();
 
-  const updatePrice = totalPriceCalculator();
-  updateWindowPrice(updatePrice);
+  await totalPriceCalculator();
 };
 
 /** Função responsável por criar e retornar um item do carrinho.
@@ -110,11 +122,6 @@ const createCartItemElement = ({ id, title, price }) => {
   */
 const addItemInCart = (productToBuy) => GET_BUY_LIST.appendChild(productToBuy);
 
-/** Função responsável por requisitar dados do produto à API.
-  * @param {string} productClicked - Elemento selecionado pelo usuário através do clique no botão "adicionar ao carrinho".
-  */
-const requireClickedItemInfo = async (productClicked) => fetchItem(productClicked);
-
 /** Função responsável administrar o fluxo de trabalho do código após interação do usuário com o botão "adicionar ao carrinho".
   * @param {string} itemClicked - Elemento selecionado pelo usuário através do clique no botão "adicionar ao carrinho".
   * @param {object} infoItem - constante que armazenará o objeto, resultado da requisição à API.
@@ -125,8 +132,7 @@ async function market(itemClicked) {
   const itemToAddInBuyList = createCartItemElement(infoItem);
   addItemInCart(itemToAddInBuyList);
 
-  const updatePrice = totalPriceCalculator();
-  updateWindowPrice(updatePrice);
+  await totalPriceCalculator();
 
   saveInLocalStorage(infoItem, itemToAddInBuyList);
 }
@@ -208,16 +214,16 @@ const getEachItemFromAPI = (ArrayDeObjFromAPI) => {
   * @param {Object} itemSaved - Objeto que contém informações do elemento salvo no local storage.
   * @param {HTML} liElement - Elemento 'lista' HTML que contém as informações do elemento salvo no local storage.
   */
-function localStorageManager() {
+async function localStorageManager() {
   const recoveryLocalStorageData = getSavedCartItems('cartItem');
   if (recoveryLocalStorageData) {
-    recoveryLocalStorageData.forEach((itemSaved) => {
-      const liElement = createCartItemElement(itemSaved);
+    recoveryLocalStorageData.forEach(async (itemSaved) => {
+      const infoItem = await requireClickedItemInfo(itemSaved.id);
+      const liElement = createCartItemElement(infoItem);
       addItemInCart(liElement);
+      await totalPriceCalculator();
     });
   }
-  const updatePrice = totalPriceCalculator();
-  updateWindowPrice(updatePrice);
 }
 
 /** Função responsável iniciar o script, e a consulta à API, assim que a página HTML é carregada.
@@ -226,5 +232,5 @@ function localStorageManager() {
 window.onload = async () => {
   const requestAPI = await fetchProducts('computador');
   getEachItemFromAPI(requestAPI.results);
-  localStorageManager();
+  await localStorageManager();
 };
