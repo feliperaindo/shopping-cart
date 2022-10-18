@@ -61,6 +61,7 @@ const loadingScreenStart = () => {
 };
 
 // Funções de Local Storage
+const setLocalStorage = () => saveCartItems('cartItem', []);
 const removeCartItemFromLocalStorage = (itemToRemove) => {
   const localStorage = JSON.parse(getSavedCartItems('cartItem'));
   const findItemToRemoved = localStorage.filter((removeItem) => removeItem.HTMLId !== itemToRemove);
@@ -72,6 +73,7 @@ const removeCartItemFromLocalStorage = (itemToRemove) => {
   saveCartItems('cartItem', renameAllData);
 };
 function saveInLocalStorage({ id, title, price }, liElement) {
+  setLocalStorage();
   const oldLocalStorage = JSON.parse(getSavedCartItems('cartItem'));
   const elementToSave = { id, title, price, HTMLId: liElement.id };
   saveCartItems('cartItem', [...oldLocalStorage, elementToSave]);
@@ -94,7 +96,7 @@ const totalPriceCalculator = () => {
       const price = getPrice(productInCart);
       totalPrice += price;
     });
-    updateWindowPrice(totalPrice);
+    updateWindowPrice(Math.round(totalPrice));
   }
 };
 const renameAllIdsFromCart = () => {
@@ -121,6 +123,7 @@ const createCartItemElement = ({ id, title, price }) => {
 const cleanCart = () => {
   GET_BUY_LIST.innerHTML = null;
   saveCartItems('cartItem', []);
+  updateWindowPrice();
 };
 
 // Funções de admistração do fluxo
@@ -130,7 +133,7 @@ async function market(itemClicked) {
   const itemToAddInBuyList = createCartItemElement(infoItem);
   addItemInCart(itemToAddInBuyList);
   totalPriceCalculator();
-  saveInLocalStorage(infoItem, itemToAddInBuyList);
+  saveInLocalStorage(await infoItem, itemToAddInBuyList);
 }
 function getIdFromProductItem(element) {
   const clickedElement = element.target.id;
