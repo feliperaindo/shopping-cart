@@ -73,7 +73,10 @@ const removeCartItemFromLocalStorage = (itemToRemove) => {
   saveCartItems('cartItem', renameAllData);
 };
 function saveInLocalStorage({ id, title, price }, liElement) {
-  setLocalStorage();
+  const recoveryLocalStorageData = JSON.parse(getSavedCartItems('cartItem'));
+  if (!recoveryLocalStorageData) {
+    setLocalStorage();
+  }
   const oldLocalStorage = JSON.parse(getSavedCartItems('cartItem'));
   const elementToSave = { id, title, price, HTMLId: liElement.id };
   saveCartItems('cartItem', [...oldLocalStorage, elementToSave]);
@@ -96,7 +99,7 @@ const totalPriceCalculator = () => {
       const price = getPrice(productInCart);
       totalPrice += price;
     });
-    updateWindowPrice(Math.round(totalPrice));
+    updateWindowPrice(totalPrice);
   }
 };
 const renameAllIdsFromCart = () => {
@@ -144,7 +147,7 @@ function getIdFromProductItem(element) {
 function localStorageManager() {
   const recoveryLocalStorageData = JSON.parse(getSavedCartItems('cartItem'));
   if (!recoveryLocalStorageData) {
-    saveCartItems('cartItem', []);
+    setLocalStorage();
     return;
   }
   recoveryLocalStorageData.forEach((itemSaved) => {
