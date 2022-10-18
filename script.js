@@ -56,7 +56,7 @@ const getEachItemFromAPI = (ArrayDeObjFromAPI) => {
   });
 };
 const loadingScreenStart = () => {
-  const loadingElement = createCustomElement('span', 'span-loading', 'carregando...');
+  const loadingElement = createCustomElement('span', 'loading', 'carregando...');
   GET_SECTION_CONTAINER.insertBefore(loadingElement, GET_SECTION_CONTAINER.firstChild);
 };
 
