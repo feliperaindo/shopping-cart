@@ -80,8 +80,7 @@ const removeCartItemFromLocalStorage = (itemToRemove) => {
 };
 const saveInLocalStorage = ({ id, title, price }, liElement) => {
   const oldLocalStorage = recoveryLocalStorage('cartItem');
-  const elementToSave = { id, title, price, HTMLId: liElement.id };
-  saveCartItems('cartItem', [...oldLocalStorage, elementToSave]);
+  saveCartItems('cartItem', [...oldLocalStorage, { id, title, price, HTMLId: liElement.id }]);
 };
 
 // Funções relacionadas ao carrinho de compras
