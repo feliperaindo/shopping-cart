@@ -78,18 +78,18 @@ const removeCartItemFromLocalStorage = (itemToRemove) => {
   });
   saveCartItems('cartItem', newLocalStorage);
 };
-function saveInLocalStorage({ id, title, price }, liElement) {
+const saveInLocalStorage = ({ id, title, price }, liElement) => {
   const oldLocalStorage = recoveryLocalStorage('cartItem');
   const elementToSave = { id, title, price, HTMLId: liElement.id };
   saveCartItems('cartItem', [...oldLocalStorage, elementToSave]);
-}
+};
 
 // Funções relacionadas ao carrinho de compras
 const addItemInCart = (productToBuy) => GET_BUY_LIST.appendChild(productToBuy);
-function updateWindowPrice(priceUpdate = 0) {
+const updateWindowPrice = (priceUpdate = 0) => {
   const getHTMLElement = document.querySelector('#span-price');
   getHTMLElement.innerText = `Total: $ ${priceUpdate}`;
-}
+};
 const totalPriceCalculator = () => {
   const allProductsInCart = recoveryLocalStorage('cartItem');
   if (!GET_BUY_LIST.childNodes.length) {
@@ -128,34 +128,34 @@ const cleanCart = () => {
 };
 
 // Funções de admistração do fluxo
-async function market(itemClicked) {
+const market = async (itemClicked) => {
   loadingScreenStart();
   const infoItem = await requireClickedItemInfo(itemClicked);
   const itemToAddInBuyList = createCartItemElement(infoItem);
   addItemInCart(itemToAddInBuyList);
   saveInLocalStorage(await infoItem, itemToAddInBuyList);
   totalPriceCalculator();
-}
-function getIdFromProductItem(element) {
+};
+const getIdFromProductItem = (element) => {
   const clickedElement = element.target.id;
   const getElementNumber = clickedElement.match(/(\d+)/)[0];
   const elementToSearch = document.querySelector(`#span-item_id-${getElementNumber}`);
   market(elementToSearch.innerText);
-}
-function localStorageManager() {
+};
+const localStorageManager = () => {
   const oldLocalStorage = recoveryLocalStorage('cartItem');
   oldLocalStorage.forEach((itemSaved) => {
     const liElement = createCartItemElement(itemSaved);
     addItemInCart(liElement);
     totalPriceCalculator();
   });
-}
-function makeButtonsDinamics() {
+};
+const makeButtonsDinamics = () => {
   const GET_BUTTONS = document.querySelectorAll('.item__add');
   GET_BUTTONS.forEach((listeningButton) => {
     listeningButton.addEventListener('click', getIdFromProductItem);
   });
-}
+};
 window.onload = async () => {
   loadingScreenStart();
   const requestAPI = await fetchProducts('computador');
