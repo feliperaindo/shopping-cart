@@ -69,14 +69,14 @@ const recoveryLocalStorage = (dataKey) => {
   return JSON.parse(localStorage.getItem(dataKey));
 };
 const removeCartItemFromLocalStorage = (itemToRemove) => {
-  const localStorage = recoveryLocalStorage('cartItem');
-  const findItemToRemoved = localStorage.filter((removeItem) => removeItem.HTMLId !== itemToRemove);
-  const renameAllData = findItemToRemoved.map(({ id, title, price, HTMLId }, index) => {
+  const oldLocalStorage = recoveryLocalStorage('cartItem');
+  const itemRemoved = oldLocalStorage.filter((removeItem) => removeItem.HTMLId !== itemToRemove);
+  const newLocalStorage = itemRemoved.map(({ id, title, price, HTMLId }, index) => {
     const newId = HTMLId.replace(/\d+/g, index);
     const newObj = { id, title, price, HTMLId: newId };
     return newObj;
   });
-  saveCartItems('cartItem', renameAllData);
+  saveCartItems('cartItem', newLocalStorage);
 };
 function saveInLocalStorage({ id, title, price }, liElement) {
   const oldLocalStorage = recoveryLocalStorage('cartItem');
@@ -90,18 +90,14 @@ function updateWindowPrice(priceUpdate = 0) {
   const getHTMLElement = document.querySelector('#span-price');
   getHTMLElement.innerText = `Total: $ ${priceUpdate}`;
 }
-const getPrice = (productInCart) => 
-  Number(productInCart.innerText.replace(/\s+/g, '').split('PRICE:$')[1]);
 const totalPriceCalculator = () => {
-  let totalPrice = 0;
+  const allProductsInCart = recoveryLocalStorage('cartItem');
   if (!GET_BUY_LIST.childNodes.length) {
     updateWindowPrice();
   } else {
-    GET_BUY_LIST.childNodes.forEach((productInCart) => {
-      const price = getPrice(productInCart);
-      totalPrice += price;
-    });
-    updateWindowPrice(totalPrice);
+    const totalInCart = allProductsInCart.reduce((total, { price }) => 
+      Number(price) + total, 0);
+    updateWindowPrice(totalInCart);
   }
 };
 const renameAllIdsFromCart = () => {
@@ -137,8 +133,8 @@ async function market(itemClicked) {
   const infoItem = await requireClickedItemInfo(itemClicked);
   const itemToAddInBuyList = createCartItemElement(infoItem);
   addItemInCart(itemToAddInBuyList);
-  totalPriceCalculator();
   saveInLocalStorage(await infoItem, itemToAddInBuyList);
+  totalPriceCalculator();
 }
 function getIdFromProductItem(element) {
   const clickedElement = element.target.id;
