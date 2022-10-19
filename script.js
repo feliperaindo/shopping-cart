@@ -136,12 +136,8 @@ const market = async (itemClicked) => {
   saveInLocalStorage(await infoItem, itemToAddInBuyList);
   totalPriceCalculator();
 };
-const getIdFromProductItem = (element) => {
-  const clickedElement = element.target.id;
-  const getElementNumber = clickedElement.match(/(\d+)/)[0];
-  const elementToSearch = document.querySelector(`#span-item_id-${getElementNumber}`);
-  market(elementToSearch.innerText);
-};
+const getIdFromProductItem = ({ target }) => 
+  market(target.parentNode.querySelector('.item_id').innerText);
 const localStorageManager = () => {
   const oldLocalStorage = recoveryLocalStorage('cartItem');
   oldLocalStorage.forEach((itemSaved) => {
