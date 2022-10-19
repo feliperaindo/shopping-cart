@@ -2,6 +2,7 @@
 const GET_BUY_LIST = document.querySelector('#cart__items');
 const GET_BUTTON_CLEAN_ALL = document.querySelector('#empty-cart-id');
 const GET_SECTION_CONTAINER = document.querySelector('#container-id');
+const GET_ITEMS_CONTAINER = document.querySelector('#items-container');
 
 // Funções de consulta à API
 const requireClickedItemInfo = async (productClicked) => fetchItem(productClicked);
@@ -45,8 +46,7 @@ const createProductItemElement = ({ id, title, thumbnail }, number) => {
   return section;
 };
 const populateWebPage = (population) => {
-  const getSectionContainer = document.querySelector('#items-container');
-  getSectionContainer.appendChild(population);
+  GET_ITEMS_CONTAINER.appendChild(population);
 };
 const getEachItemFromAPI = (ArrayDeObjFromAPI) => {
   loadingScreenEnd();
@@ -61,9 +61,15 @@ const loadingScreenStart = () => {
 };
 
 // Funções de Local Storage
-const setLocalStorage = () => saveCartItems('cartItem', []);
+const setLocalStorage = (keyLocalStorage) => saveCartItems(keyLocalStorage, []);
+const recoveryLocalStorage = (dataKey) => {
+  if (!localStorage.getItem(dataKey)) {
+    setLocalStorage(dataKey);
+  }
+  return JSON.parse(localStorage.getItem(dataKey));
+};
 const removeCartItemFromLocalStorage = (itemToRemove) => {
-  const localStorage = JSON.parse(getSavedCartItems('cartItem'));
+  const localStorage = recoveryLocalStorage('cartItem');
   const findItemToRemoved = localStorage.filter((removeItem) => removeItem.HTMLId !== itemToRemove);
   const renameAllData = findItemToRemoved.map(({ id, title, price, HTMLId }, index) => {
     const newId = HTMLId.replace(/\d+/g, index);
@@ -73,11 +79,7 @@ const removeCartItemFromLocalStorage = (itemToRemove) => {
   saveCartItems('cartItem', renameAllData);
 };
 function saveInLocalStorage({ id, title, price }, liElement) {
-  const recoveryLocalStorageData = JSON.parse(getSavedCartItems('cartItem'));
-  if (!recoveryLocalStorageData) {
-    setLocalStorage();
-  }
-  const oldLocalStorage = JSON.parse(getSavedCartItems('cartItem'));
+  const oldLocalStorage = recoveryLocalStorage('cartItem');
   const elementToSave = { id, title, price, HTMLId: liElement.id };
   saveCartItems('cartItem', [...oldLocalStorage, elementToSave]);
 }
@@ -145,12 +147,8 @@ function getIdFromProductItem(element) {
   market(elementToSearch.innerText);
 }
 function localStorageManager() {
-  const recoveryLocalStorageData = JSON.parse(getSavedCartItems('cartItem'));
-  if (!recoveryLocalStorageData) {
-    setLocalStorage();
-    return;
-  }
-  recoveryLocalStorageData.forEach((itemSaved) => {
+  const oldLocalStorage = recoveryLocalStorage('cartItem');
+  oldLocalStorage.forEach((itemSaved) => {
     const liElement = createCartItemElement(itemSaved);
     addItemInCart(liElement);
     totalPriceCalculator();
@@ -167,7 +165,6 @@ window.onload = async () => {
   const requestAPI = await fetchProducts('computador');
   getEachItemFromAPI(requestAPI.results);
   makeButtonsDinamics();
-  updateWindowPrice();
   localStorageManager();
   GET_BUTTON_CLEAN_ALL.addEventListener('click', cleanCart);
 };
